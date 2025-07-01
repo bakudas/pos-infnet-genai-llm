@@ -1,0 +1,41 @@
+# Ambiente virtual
+.venv/
+venv/
+ENV/
+
+# Bytecode Python
+dist/
+build/
+__pycache__/
+*.py[cod]
+*.so
+
+# Configurações do VSCode/.idea
+.vscode/
+.idea/
+
+# Arquivos temporários
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Dados e imagens geradas
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Arquivos de credenciais
+.env
+.env.*
+
+# Streamlit
+.streamlit/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Outros
+.DS_Store
+Thumbs.db

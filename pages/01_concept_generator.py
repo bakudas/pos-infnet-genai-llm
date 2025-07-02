@@ -51,7 +51,7 @@ def display_gdd_concept(gdd_data: OnePageGDD, generated_image: Optional[Image.Im
     else:
         # URL de placeholder
         image_url = "https://placehold.co/600x300/007bff/ffffff?text=Arte+Conceitual+Gerada"
-        st.image(image_url, caption="Arte Conceitual (Placeholder)", use_column_width=True)
+        st.image(image_url, caption="Arte Conceitual (Placeholder)", use_container_width =True)
 
     st.markdown("---")
 

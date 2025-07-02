@@ -10,37 +10,31 @@ from pathlib import Path
 
 # Lista de páginas e ícones
 PAGES = [
-    {"name": "Página Inicial", "icon": "🏠", "path": "app.py", "url": "/"},
-    {"name": "Concept Generator", "icon": "📝", "path": "pages/01_concept_generator.py", "url": "/concept_generator"},
-    {"name": "Competitor Analysis", "icon": "🔍", "path": "pages/02_competitor_analysis.py", "url": "/competitor_analysis"},
-    {"name": "Core Loop Developer", "icon": "🔄", "path": "pages/03_core_loop_developer.py", "url": "/core_loop_developer"},
-    {"name": "Game Flow Creator", "icon": "🎯", "path": "pages/04_game_flow_creator.py", "url": "/game_flow_creator"},
-    {"name": "Pitch Deck Creator", "icon": "📊", "path": "pages/05_pitch_deck_creator.py", "url": "/pitch_deck_creator"},
+    {"name": "Página Inicial", "icon": "🏠", "file": "app.py"},
+    {"name": "Concept Generator", "icon": "📝", "file": "pages/01_concept_generator.py"},
+    {"name": "Competitor Analysis", "icon": "🔍", "file": "pages/02_competitor_analysis.py"},
+    {"name": "Core Loop Developer", "icon": "🔄", "file": "pages/03_core_loop_developer.py"},
+    {"name": "Game Flow Creator", "icon": "🎯", "file": "pages/04_game_flow_creator.py"},
+    {"name": "Pitch Deck Creator", "icon": "📊", "file": "pages/05_pitch_deck_creator.py"},
 ]
 
 def render_sidebar():
     """
-    Renderiza a sidebar com menu de navegação, informações da sessão, configuração e histórico.
+    Renderiza a sidebar com menu de navegação nativo, informações da sessão, configuração e histórico.
     """
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
     with st.sidebar:
-        # --- Navegação ---
         st.markdown("<div style='font-size:1.2em; font-weight:bold; margin-bottom:0.5em;'>📄 Navegação</div>", unsafe_allow_html=True)
-        current_url = st.query_params.get('page', ['/'])[0]
-        # Detecta página ativa pelo URL
+        # Detecta página ativa
+        current_page = Path(st.session_state.get("__file__", "")).name.lower()
         for page in PAGES:
-            is_active = (
-                (page['url'] == '/' and current_url in ['', '/']) or
-                (page['url'] != '/' and page['url'].strip('/') == current_url.strip('/'))
-            )
-            style = (
-                "background-color:#444; border-radius:8px; font-weight:bold;" if is_active else ""
-            )
-            st.markdown(
-                f"<a href='{page['url']}' style='text-decoration:none; color:inherit; display:block; padding:0.1em 0.4em; margin-bottom:0px; {style}'>"
-                f"{page['icon']} {page['name']}"
-                "</a>", unsafe_allow_html=True
-            )
+            is_active = page['file'].lower().endswith(current_page)
+            btn_label = f"{page['icon']} {page['name']}"
+            if is_active:
+                st.button(btn_label, use_container_width=True, disabled=True, key=f"nav_{page['file']}")
+            else:
+                if st.button(btn_label, use_container_width=True, key=f"nav_{page['file']}"):
+                    st.switch_page(page['file'])
         st.markdown("<hr style='margin:0.7em 0;' />", unsafe_allow_html=True)
 
         # Status do conceito atual
@@ -55,7 +49,6 @@ def render_sidebar():
         else:
             st.info("ℹ️ Nenhum conceito carregado")
             st.markdown("Gere um conceito na página Concept Generator para começar!")
-
         st.markdown("---")
 
         # Status da configuração
@@ -65,7 +58,6 @@ def render_sidebar():
         if not GEMINI_API_KEY:
             st.error("⚠️ GEMINI_API_KEY não encontrada!")
             st.markdown("Configure sua chave de API para usar o app.")
-
         st.markdown("---")
 
         # Informações da aplicação

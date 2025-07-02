@@ -6,19 +6,42 @@ Centraliza a lógica da sidebar para reutilização em todas as páginas.
 import streamlit as st
 import os
 from datetime import datetime
+from pathlib import Path
 
+# Lista de páginas e ícones
+PAGES = [
+    {"name": "Página Inicial", "icon": "🏠", "path": "app.py", "url": "/"},
+    {"name": "Concept Generator", "icon": "📝", "path": "pages/01_concept_generator.py", "url": "/concept_generator"},
+    {"name": "Competitor Analysis", "icon": "🔍", "path": "pages/02_competitor_analysis.py", "url": "/competitor_analysis"},
+    {"name": "Core Loop Developer", "icon": "🔄", "path": "pages/03_core_loop_developer.py", "url": "/core_loop_developer"},
+    {"name": "Game Flow Creator", "icon": "🎯", "path": "pages/04_game_flow_creator.py", "url": "/game_flow_creator"},
+    {"name": "Pitch Deck Creator", "icon": "📊", "path": "pages/05_pitch_deck_creator.py", "url": "/pitch_deck_creator"},
+]
 
 def render_sidebar():
     """
-    Renderiza a sidebar com informações da sessão, configuração e histórico.
-    Esta função deve ser chamada em todas as páginas para manter consistência.
+    Renderiza a sidebar com menu de navegação, informações da sessão, configuração e histórico.
     """
-
-    # Verificação da chave de API
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-
     with st.sidebar:
-        st.title("📋 Sessão Atual")
+        # --- Navegação ---
+        st.markdown("<div style='font-size:1.2em; font-weight:bold; margin-bottom:0.5em;'>📄 Navegação</div>", unsafe_allow_html=True)
+        current_url = st.query_params.get('page', ['/'])[0]
+        # Detecta página ativa pelo URL
+        for page in PAGES:
+            is_active = (
+                (page['url'] == '/' and current_url in ['', '/']) or
+                (page['url'] != '/' and page['url'].strip('/') == current_url.strip('/'))
+            )
+            style = (
+                "background-color:#444; border-radius:8px; font-weight:bold;" if is_active else ""
+            )
+            st.markdown(
+                f"<a href='{page['url']}' style='text-decoration:none; color:inherit; display:block; padding:0.1em 0.4em; margin-bottom:0px; {style}'>"
+                f"{page['icon']} {page['name']}"
+                "</a>", unsafe_allow_html=True
+            )
+        st.markdown("<hr style='margin:0.7em 0;' />", unsafe_allow_html=True)
 
         # Status do conceito atual
         if 'current_gdd' in st.session_state:
@@ -26,8 +49,6 @@ def render_sidebar():
             gdd = st.session_state['current_gdd']
             st.markdown(f"**Título:** {gdd.get('titulo_provisorio', 'Sem título')}")
             st.markdown(f"**Gênero:** {gdd.get('genero', 'N/A')}")
-
-            # Botão para limpar sessão
             if st.button("🔄 Limpar Sessão", use_container_width=True):
                 clear_session_data()
                 st.rerun()
@@ -41,20 +62,9 @@ def render_sidebar():
         st.markdown("**🔧 Configuração:**")
         api_status = "✅ Conectado" if GEMINI_API_KEY else "❌ Não configurado"
         st.markdown(f"API Status: {api_status}")
-
         if not GEMINI_API_KEY:
             st.error("⚠️ GEMINI_API_KEY não encontrada!")
             st.markdown("Configure sua chave de API para usar o app.")
-
-        st.markdown("---")
-
-        # Histórico de pitch decks
-        st.markdown("**📊 Histórico de Pitch Decks:**")
-        if 'pitch_deck_history' in st.session_state and st.session_state.pitch_deck_history:
-            for i, pitch in enumerate(st.session_state.pitch_deck_history[-3:], 1):
-                st.markdown(f"{i}. {pitch.get('concept_title', 'Sem título')} - {pitch.get('publico_alvo', 'N/A')}")
-        else:
-            st.markdown("Nenhum pitch deck disponível")
 
         st.markdown("---")
 

@@ -20,24 +20,22 @@ PAGES = [
 
 def render_sidebar():
     """
-    Renderiza a sidebar com menu de navegação nativo, informações da sessão, configuração e histórico.
+    Sidebar multipage robusta: navegação customizada, status, config, histórico e sobre.
     """
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
     with st.sidebar:
+        # --- Navegação ---
         st.markdown("<div style='font-size:1.2em; font-weight:bold; margin-bottom:0.5em;'>📄 Navegação</div>", unsafe_allow_html=True)
-        # Detecta página ativa
-        current_page = Path(st.session_state.get("__file__", "")).name.lower()
+        current_page = Path(st.session_state.get('__file__', '')).name.lower()
         for page in PAGES:
-            is_active = page['file'].lower().endswith(current_page)
+            is_active = Path(page['file']).name.lower() == current_page
             btn_label = f"{page['icon']} {page['name']}"
-            if is_active:
-                st.button(btn_label, use_container_width=True, disabled=True, key=f"nav_{page['file']}")
-            else:
-                if st.button(btn_label, use_container_width=True, key=f"nav_{page['file']}"):
+            if st.button(btn_label, use_container_width=True, disabled=is_active, key=f"nav_{page['file']}"):
+                if not is_active:
                     st.switch_page(page['file'])
-        st.markdown("<hr style='margin:0.7em 0;' />", unsafe_allow_html=True)
+        st.markdown("---")
 
-        # Status do conceito atual
+        # --- Status do conceito atual ---
         if 'current_gdd' in st.session_state:
             st.success("✅ Conceito carregado")
             gdd = st.session_state['current_gdd']
@@ -51,7 +49,7 @@ def render_sidebar():
             st.markdown("Gere um conceito na página Concept Generator para começar!")
         st.markdown("---")
 
-        # Status da configuração
+        # --- Status da configuração ---
         st.markdown("**🔧 Configuração:**")
         api_status = "✅ Conectado" if GEMINI_API_KEY else "❌ Não configurado"
         st.markdown(f"API Status: {api_status}")
@@ -60,7 +58,16 @@ def render_sidebar():
             st.markdown("Configure sua chave de API para usar o app.")
         st.markdown("---")
 
-        # Informações da aplicação
+        # --- Histórico de pitch decks ---
+        st.markdown("**📊 Histórico de Pitch Decks:**")
+        if 'pitch_deck_history' in st.session_state and st.session_state.pitch_deck_history:
+            for i, pitch in enumerate(st.session_state.pitch_deck_history[-3:], 1):
+                st.markdown(f"{i}. {pitch.get('concept_title', 'Sem título')} - {pitch.get('publico_alvo', 'N/A')}")
+        else:
+            st.markdown("Nenhum pitch deck disponível")
+        st.markdown("---")
+
+        # --- Sobre ---
         st.markdown("**ℹ️ Sobre:**")
         st.markdown("🎮 **Game Concept Forge @ Wilson Melo**")
         st.markdown("Versão: 1.1.0")

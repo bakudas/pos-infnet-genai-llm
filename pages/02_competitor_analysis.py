@@ -148,6 +148,7 @@ if 'current_gdd' in st.session_state and 'current_concept' in st.session_state:
     )
 else:
     st.warning("⚠️ Nenhum conceito encontrado na sessão. Gere um conceito primeiro ou insira um manualmente.")
+    st.markdown("[Ir para Concept Generator](/concept_generator)")
     concept_for_analysis = st.text_area(
         "Descreva o conceito de jogo para análise:",
         placeholder="Ex: Um jogo de cartas onde os jogadores constroem baralhos baseados em personagens históricos...",

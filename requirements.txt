@@ -1,4 +1,5 @@
-streamlit
-langchain
-google-genai
+streamlit>=1.28.0
+google-generativeai>=0.3.0
 typing_extensions
+Pillow>=10.0.0
+reportlab>=4.0.0

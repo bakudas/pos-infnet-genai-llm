@@ -3,3 +3,4 @@ google-generativeai>=0.3.0
 typing_extensions
 Pillow>=10.0.0
 reportlab>=4.0.0
+google-genai>=1.0.0

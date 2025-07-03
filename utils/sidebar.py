@@ -58,11 +58,12 @@ def render_sidebar():
             st.markdown("Configure sua chave de API para usar o app.")
         st.markdown("---")
 
-        # --- Histórico de pitch decks ---
+        # --- Histórico de pitch decks (dropdown elegante) ---
         st.markdown("**📊 Histórico de Pitch Decks:**")
         if 'pitch_deck_history' in st.session_state and st.session_state.pitch_deck_history:
-            for i, pitch in enumerate(st.session_state.pitch_deck_history[-3:], 1):
-                st.markdown(f"{i}. {pitch.get('concept_title', 'Sem título')} - {pitch.get('publico_alvo', 'N/A')}")
+            with st.expander("Ver últimos 5 pitch decks", expanded=False):
+                for i, pitch in enumerate(st.session_state.pitch_deck_history[-5:][::-1], 1):
+                    st.markdown(f"**{i}.** {pitch.get('concept_title', 'Sem título')} - {pitch.get('publico_alvo', 'N/A')}")
         else:
             st.markdown("Nenhum pitch deck disponível")
         st.markdown("---")
